@@ -1,10 +1,10 @@
 """
-{{pkg_name}}
+qrztools
 ---
-{{pkg_description}}
+QRZ API interface in Python
 
-Copyright {{YYYY}} {{authors}}
-Released under the terms of the {{license}} license.
+Copyright 2021 classabbyamp, 0x5c
+Released under the terms of the BSD 3-Clause license.
 """
 
 

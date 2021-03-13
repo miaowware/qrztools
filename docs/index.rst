@@ -1,8 +1,8 @@
 ============
-{{pkg_name}}
+qrztools
 ============
 
-{{pkg_description}}
+QRZ API interface in Python
 
 .. toctree::
     :hidden:
@@ -12,14 +12,14 @@
 Installation
 ============
 
-``{{pkg_name}}`` requires Python 3.8 at minimum. Install by running::
+``qrztools`` requires Python 3.8 at minimum. Install by running::
 
-    $ pip install {{pkg_name}}
+    $ pip install qrztools
 
 License
 =======
 
-Copyright {{YYYY}} {{authors}}
+Copyright 2021 classabbyamp, 0x5c
 
-Released under the {{license}} License. See ``LICENSE`` for the full license text.
+Released under the BSD 3-Clause License. See ``LICENSE`` for the full license text.
 

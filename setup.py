@@ -1,6 +1,6 @@
 import pathlib
 from setuptools import setup
-import {{pkg_name}}.__info__ as info
+import qrztools.__info__ as info
 
 # The directory containing this file
 HERE = pathlib.Path(__file__).parent
@@ -23,11 +23,11 @@ setup(
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.8",
     ],
-    packages=["{{pkg_name}}"],
+    packages=["qrztools"],
     package_data={
         # NOTE: if the package has typing annotations, add an empty file named
         # "py.typed" to the package directory.
-        # "{{pkg_name}}": ["py.typed"]
+        # "qrztools": ["py.typed"]
     },
     # NOTE: add the package's requirements here
     install_requires=[],

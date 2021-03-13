@@ -20,9 +20,9 @@ sys.path.insert(0, os.path.abspath(".."))
 
 # -- Project information -----------------------------------------------------
 
-project = '{{pkg_name}}'
-copyright = '{{YYYY}}, {{authors}}'
-author = '{{authors}}'
+project = 'qrztools'
+copyright = '2021, classabbyamp, 0x5c'
+author = 'classabbyamp, 0x5c'
 
 # The full version, including alpha/beta/rc tags
 release = '{{version}}'
