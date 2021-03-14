@@ -4,3 +4,4 @@ mypy
 twine
 sphinx
 sphinx-autobuild
+lxml-stubs
