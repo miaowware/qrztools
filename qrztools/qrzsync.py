@@ -13,7 +13,7 @@ from lxml import etree
 import requests
 
 from .__info__ import __version__
-from .qrztools import QrzAbc, QrzCallsignData, QrzDxccData, QrzConnectionError, BASE_URL
+from .qrztools import QrzAbc, QrzCallsignData, QrzDxccData, QrzError, BASE_URL
 
 
 class QrzSync(QrzAbc):
@@ -33,7 +33,7 @@ class QrzSync(QrzAbc):
     def get_callsign(self, callsign: str) -> QrzCallsignData:
         try:
             self._check_session()
-        except QrzConnectionError:
+        except QrzError:
             self._login()
         resp_xml = self._do_query({"s": self._session_key, "callsign": callsign.upper()})
         if isinstance(resp_xml, etree._Element):
@@ -43,21 +43,23 @@ class QrzSync(QrzAbc):
     def get_bio(self, callsign: str) -> str:
         try:
             self._check_session()
-        except QrzConnectionError:
+        except QrzError:
             self._login()
         bio = self._do_query({"s": self._session_key, "html": callsign.upper()})
         if isinstance(bio, str):
             return bio
         return ""
 
-    def get_prefix(self, query: str) -> QrzDxccData:
+    def get_dxcc(self, query: str) -> QrzDxccData:
+        if query.lower() == "all":
+            raise NotImplementedError("Getting all DXCC data is not supported at this time.")
         try:
             self._check_session()
-        except QrzConnectionError:
+        except QrzError:
             self._login()
         resp_xml = self._do_query({"s": self._session_key, "dxcc": query.upper()})
         if isinstance(resp_xml, etree._Element):
-            return self._process_prefix(resp_xml)
+            return self._process_dxcc(resp_xml)
         return QrzDxccData()
 
     def _login(self) -> None:
@@ -74,7 +76,7 @@ class QrzSync(QrzAbc):
         url = BASE_URL + ";".join(f"{k}={v}" for k, v in query.items())
         with self._session.get(url) as resp:
             if resp.status_code != 200:
-                raise QrzConnectionError(f"Unable to connect to QRZ (HTTP Error {resp.status_code})")
+                raise QrzError(f"Unable to connect to QRZ (HTTP Error {resp.status_code})")
             if "html" in query:
                 return resp.text
             with BytesIO(resp.content) as resp_bytes:

@@ -11,6 +11,8 @@ from importlib.util import find_spec
 
 from .__info__ import __version__  # noqa: F401
 
+from .qrztools import QrzError, QrzCallsignData, QrzDxccData  # noqa: F401
+
 if find_spec("requests"):
     from .qrzsync import QrzSync  # noqa: F401
 if find_spec("aiohttp"):

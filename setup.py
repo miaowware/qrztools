@@ -1,5 +1,5 @@
 import pathlib
-from setuptools import setup
+from setuptools import setup  # type: ignore
 import qrztools.__info__ as info
 
 # The directory containing this file
@@ -28,6 +28,7 @@ setup(
         "Intended Audience :: Developers",
         "Operating System :: OS Independent",
         "Topic :: Communications :: Ham Radio",
+        "Framework :: AsyncIO",
     ],
     packages=["qrztools"],
     package_data={
@@ -36,6 +37,7 @@ setup(
     install_requires=[
         "lxml",
         "gridtools",
+        "rich",
         "requests; extra != 'async'"
     ],
     extras_require={

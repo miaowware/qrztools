@@ -21,7 +21,7 @@ from .__info__ import __version__
 BASE_URL = "https://xmldata.qrz.com/xml/current/?"
 
 
-class QrzConnectionError(ConnectionError):
+class QrzError(Exception):
     def __init__(self, *args: object) -> None:
         super().__init__(*args)
 
@@ -60,13 +60,13 @@ class Name:
 
 
 class GeoLocSource(enum.Enum):
-    USER = enum.auto()
-    GEOCODE = enum.auto()
-    GRID = enum.auto()
-    ZIP = enum.auto()
-    STATE = enum.auto()
-    DXCC = enum.auto()
-    NONE = None
+    USER = "User"
+    GEOCODE = "Geocode"
+    GRID = "Grid"
+    ZIP = "Zip Code"
+    STATE = "State"
+    DXCC = "DXCC"
+    NONE = "None"
 
 
 class Contient(enum.Enum):
@@ -201,7 +201,7 @@ class QrzAbc(ABC):
         pass
 
     @abstractmethod
-    def get_prefix(self, query) -> QrzDxccData:
+    def get_dxcc(self, query) -> QrzDxccData:
         pass
 
     @abstractmethod
@@ -217,6 +217,8 @@ class QrzAbc(ABC):
         pass
 
     def _process_callsign(self, resp_xml: etree._Element) -> QrzCallsignData:
+        # check for errors like "not found"
+        self._process_check_session(resp_xml)
         resp_xml_data = resp_xml.xpath("/x:QRZDatabase/x:Callsign", namespaces={"x": "http://xmldata.qrz.com"})
         data = {el.tag.split("}")[1]: el.text for el in resp_xml_data[0].getiterator()}  # type: ignore
 
@@ -286,7 +288,10 @@ class QrzAbc(ABC):
 
         calldata.timezone = data.get("TimeZone", "")
         calldata.gmt_offset = data.get("GMTOffset", "")
-        calldata.observes_dst = bool(data.get("DST", False))
+
+        dst = data.get("DST", False)
+        calldata.observes_dst = True if dst == "1" else False
+
         calldata.user = data.get("user", "")
         calldata.email = data.get("email", "")
         calldata.url = data.get("url", "")
@@ -312,13 +317,20 @@ class QrzAbc(ABC):
         if not isinstance(last_mod, datetime):
             calldata.last_modified = datetime.strptime(last_mod, "%Y-%m-%d %H:%M:%S")
 
-        calldata.eqsl = bool(data.get("eqsl", False))
-        calldata.mail_qsl = bool(data.get("mqsl", False))
-        calldata.lotw_qsl = bool(data.get("lotw", False))
+        eqsl = data.get("eqsl", "")
+        calldata.eqsl = True if eqsl == "1" else False
+
+        mail_qsl = data.get("mqsl", "")
+        calldata.mail_qsl = True if mail_qsl == "1" else False
+
+        lotw_qsl = data.get("lotw", "")
+        calldata.lotw_qsl = True if lotw_qsl == "1" else False
 
         return calldata
 
-    def _process_prefix(self, resp_xml: etree._Element) -> QrzDxccData:
+    def _process_dxcc(self, resp_xml: etree._Element) -> QrzDxccData:
+        # check for errors like "not found"
+        self._process_check_session(resp_xml)
         resp_xml_data = resp_xml.xpath("/x:QRZDatabase/x:DXCC", namespaces={"x": "http://xmldata.qrz.com"})
         data = {el.tag.split("}")[1]: el.text for el in resp_xml_data[0].getiterator()}  # type: ignore
 
@@ -355,13 +367,13 @@ class QrzAbc(ABC):
         resp_xml_session = resp_xml.xpath("/x:QRZDatabase/x:Session", namespaces={"x": "http://xmldata.qrz.com"})
         resp_session = {el.tag.split("}")[1]: el.text for el in resp_xml_session[0].getiterator()}  # type: ignore
         if "Error" in resp_session:
-            raise QrzConnectionError(resp_session["Error"])
+            raise QrzError(resp_session["Error"])
         if resp_session["SubExp"] == "non-subscriber":
-            raise QrzConnectionError("Invalid QRZ Subscription")
+            raise QrzError("Invalid QRZ Subscription")
         self._session_key = resp_session["Key"]
 
     def _process_check_session(self, resp_xml: etree._Element):
         resp_xml_session = resp_xml.xpath("/x:QRZDatabase/x:Session", namespaces={"x": "http://xmldata.qrz.com"})
         resp_session = {el.tag.split("}")[1]: el.text for el in resp_xml_session[0].getiterator()}  # type: ignore
         if "Error" in resp_session:
-            raise QrzConnectionError(resp_session["Error"])
+            raise QrzError(resp_session["Error"])
