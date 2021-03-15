@@ -8,9 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
-<!-- ## [{{version}}] - YYYY-MM-DD -->
+## [1.0.0] - 2021-03-15
+### Added
+- Synchronous and asynchronous interfaces to QRZ
 
 
-<!-- NOTE: Add these links to link the title of each section of the changelog to link to the release -->
-<!-- [Unreleased]: https://github.com/miaowware/qrztools/compare/{{version}}...HEAD -->
-<!-- [{{version}}]: https://github.com/miaowware/qrztools/releases/tag/{{version}} -->
+[Unreleased]: https://github.com/miaowware/qrztools/compare/1.0.0...HEAD
+[1.0.0]: https://github.com/miaowware/qrztools/releases/tag/1.0.0
