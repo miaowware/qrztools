@@ -1,20 +1,34 @@
-============
-qrztools
-============
+========
+QRZTools
+========
 
-QRZ API interface in Python
+A QRZ API interface in Python with sync and async support.
+
+.. highlight:: none
 
 .. toctree::
     :hidden:
+    :maxdepth: 2
 
-    index
+    cli
+    api
+    types
 
 Installation
 ============
 
-``qrztools`` requires Python 3.8 at minimum. Install by running::
+``qrztools`` requires Python 3.8 at minimum. Install by running:
 
+.. code-block:: sh
+
+    # synchronous requests only
     $ pip install qrztools
+
+    # asynchronous aiohttp only
+    $ pip install qrztools[async]
+
+    # both sync and async
+    $ pip install qrztools[all]
 
 License
 =======
@@ -22,4 +36,3 @@ License
 Copyright 2021 classabbyamp, 0x5c
 
 Released under the BSD 3-Clause License. See ``LICENSE`` for the full license text.
-

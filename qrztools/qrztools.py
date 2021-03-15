@@ -22,44 +22,67 @@ BASE_URL = "https://xmldata.qrz.com/xml/current/?"
 
 
 class QrzError(Exception):
+    """The exception raised when something goes wrong in qrztools"""
     def __init__(self, *args: object) -> None:
         super().__init__(*args)
 
 
 @dataclass
 class QrzImage:
+    """Represents a QRZ profile image"""
+    #: image url
     url: str = ""
+    #: image height in pixels
     height: int = 0
+    #: image width in pixels
     width: int = 0
+    #: approximate size in bytes
     size: int = 0
 
 
 @dataclass
 class Dxcc:
+    """Represents a DXCC entity in a :class:`QrzCallsignData` object"""
+    #: entity ID
     id: int = 0
+    #: entity name
     name: str = ""
 
 
 @dataclass
 class Address:
+    """Represents an address in a :class:`QrzCallsignData` object"""
+    #: Attention address line, this line should be prepended to the address
     attn: str = ""
+    #: address line 1 (i.e. house # and street)
     line1: str = ""
+    #: address line 2 (i.e, city name)
     line2: str = ""
+    #: state (USA Only)
     state: str = ""
+    #: Zip/postal code
     zip: str = ""
+    #: country name for the QSL mailing address
     country: str = ""
+    #: dxcc entity code for the mailing address country
     ccode: int = 0
 
 
 @dataclass
 class Name:
+    """Represents a name in a :class:`QrzCallsignData` object"""
+    #: first name(s)
     first: str = ""
+    #: last name or full name
     name: str = ""
+    #: A different or shortened name used on the air
     nickname: str = ""
+    #: Combined full name and nickname in the format used by QRZ. This fortmat is subject to change.
     formatted_name: str = ""
 
 
 class GeoLocSource(enum.Enum):
+    """Describes where the lat/long data in a :class:`QrzCallsignData` object comes from"""
     USER = "User"
     GEOCODE = "Geocode"
     GRID = "Grid"
@@ -69,7 +92,8 @@ class GeoLocSource(enum.Enum):
     NONE = "None"
 
 
-class Contient(enum.Enum):
+class Continent(enum.Enum):
+    """A continent, used for :class:`QrzDxccData`"""
     AF = "Africa"
     AN = "Antarctica"
     AS = "Asia"
@@ -81,68 +105,119 @@ class Contient(enum.Enum):
 
 @dataclass
 class QrzCallsignData:
+    """A QRZ callsign query result."""
     # callsign-related things
+    #: Callsign
     call: str
+    #: Cross reference: the query callsign that returned this record
     xref: str = ""
+    #: Other callsigns that resolve to this record
     aliases: List[str] = field(default_factory=list)
+    #: Previous callsign
     prev_call: str = ""
+    #: QSL manager info
     qsl_manager: str = ""
+    #: license effective date (USA)
     effective_date: datetime = datetime.min
+    #: license expiration date (USA)
     expire_date: datetime = datetime.min
+    #: license class
     lic_class: str = ""
+    #: license type codes (USA)
     lic_codes: str = ""
 
+    #: Operator name
     name: Name = Name()
     # location-related things
+    #: Operator mailing address
     address: Address = Address()
+    #: DXCC entity
     dxcc: Dxcc = Dxcc()
+    #: approximate lat/long of address
     latlong: LatLong = LatLong(0, 0)
+    #: grid locator of address
     grid: Grid = Grid(LatLong(0, 0))
+    #: county name (USA)
     county: str = ""
+    #: FIPS county identifier (USA)
     fips: str = ""
+    #: Metro Service Area (USPS)
     msa: str = ""
+    #: Telephone Area Code (USA)
     area_code: str = ""
+    #: CQ zone identifier
     cq_zone: int = 0
+    #: ITU zone identifier
     itu_zone: int = 0
+    #: birthdate of the operator
     born: datetime = datetime.min
+    #: IOTA designator
     iota: str = ""
+    #: Describes source of lat/long data
     geoloc: GeoLocSource = GeoLocSource.NONE
 
     # time-related things
+    #: Time zone name (USA)
     timezone: str = ""
+    #: GMT time offset
     gmt_offset: str = ""
+    #: whether daylight savings time is observed
     observes_dst: bool = False
 
     # profile-related things
+    #: User who manages this callsign on QRZ
     user: str = ""
+    #: email address
     email: str = ""
+    #: profile url
     url: str = ""
+    #: QRZ web page views
     profile_views: int = 0
+    #: approximate size of bio HTML in bytes
     bio_size: int = 0
+    #: date of last bio update
     bio_updated: datetime = datetime.min
+    #: QRZ profile image
     image: QrzImage = QrzImage()
+    #: QRZ database serial number
     serial: int = 0
+    #: QRZ callsign last modified date
     last_modified: datetime = datetime.min
+    #: whether the operator accepts eQSL
     eqsl: bool = False
+    #: whether the operator accepts mail QSL
     mail_qsl: bool = False
+    #: whether the operator accepts Logbook of the World QSL
     lotw_qsl: bool = False
 
 
 @dataclass
 class QrzDxccData:
+    """A QRZ DXCC query result."""
+    #: entity number
     dxcc: int = 0
+    #: ISO-3166-1 alpha-2 country code
     cc2: str = ""
+    #: ISO-3166-1 alpha-3 country code
     cc3: str = ""
+    #: entity name
     name: str = ""
-    continent: Optional[Contient] = None
+    #: the entity's continent
+    continent: Optional[Continent] = None
+    #: the entity's ITU zone
     ituzone: int = 0
+    #: the entity's CQ zone
     cqzone: int = 0
+    #: UTC timezone offset. Odd timezones, such as 0545 mean "5 hours, 45 minutes".
     utc_offset: str = ""
+    #: approximate latitude and longitude of the entity
     latlong: LatLong = LatLong(0, 0)
+    #: special notes/exceptions
     notes: str = ""
 
 
 class QrzAbc(ABC):
+    """The base class for QrzSync and QrzAsync. **This should not be used directly.**"""
     def __init__(self, username: str, password: str, session_key: str = "",
                  useragent: str = f"python-qrztools-v{__version__}"):
         self._username = username
@@ -152,6 +227,13 @@ class QrzAbc(ABC):
 
     @property
     def username(self) -> str:
+        """
+        :getter: gets QRZ username
+        :rtype: str
+
+        :setter: sets QRZ username
+        :type: str
+        """
         return self._username
 
     @username.setter
@@ -160,6 +242,13 @@ class QrzAbc(ABC):
 
     @property
     def password(self) -> str:
+        """
+        :getter: gets QRZ password
+        :rtype: str
+
+        :setter: sets QRZ password
+        :type: str
+        """
         return self._password
 
     @password.setter
@@ -168,6 +257,13 @@ class QrzAbc(ABC):
 
     @property
     def useragent(self) -> str:
+        """
+        :getter: gets QRZ useragent
+        :rtype: str
+
+        :setter: sets QRZ useragent
+        :type: str
+        """
         return self._useragent
 
     @useragent.setter
@@ -186,6 +282,13 @@ class QrzAbc(ABC):
 
     @property
     def session_key(self) -> str:
+        """
+        :getter: gets QRZ session key
+        :rtype: str
+
+        :setter: sets QRZ session key
+        :type: str
+        """
         return self._session_key
 
     @session_key.setter
@@ -193,15 +296,36 @@ class QrzAbc(ABC):
         self._session_key = val
 
     @abstractmethod
-    def get_callsign(self, callsign) -> QrzCallsignData:
+    def get_callsign(self, callsign: str) -> QrzCallsignData:
+        """Gets QRZ data for a callsign.
+
+        :param callsign: the callsign to search for
+        :type callsign: str
+        :return: the QRZ data for the callsign
+        :rtype: QrzCallsignData
+        """
         pass
 
     @abstractmethod
-    def get_bio(self, callsign) -> str:
+    def get_bio(self, callsign: str) -> str:
+        """Get the HTML for the bio of a callsign
+
+        :param callsign: the callsign to search for
+        :type callsign: str
+        :return: the bio HTML
+        :rtype: str
+        """
         pass
 
     @abstractmethod
-    def get_dxcc(self, query) -> QrzDxccData:
+    def get_dxcc(self, query: Union[str, int]) -> QrzDxccData:
+        """Get data about a DXCC entity from a DXCC entity number or callsign.
+
+        :param query: a DXCC entity number or callsign
+        :type query: Union[str, int]
+        :return: the data about the DXCC entity
+        :rtype: QrzDxccData
+        """
         pass
 
     @abstractmethod
@@ -294,7 +418,7 @@ class QrzAbc(ABC):
 
         calldata.user = data.get("user", "")
         calldata.email = data.get("email", "")
-        calldata.url = data.get("url", "")
+        calldata.url = data.get("url", f"https://www.qrz.com/db/{calldata.call}")
         calldata.profile_views = int(data.get("u_views", 0))
         calldata.bio_size = int(data.get("bio", 0))
 
@@ -343,17 +467,17 @@ class QrzAbc(ABC):
 
         cont = data.get("continent", None)
         if cont == "AF":
-            dxccdata.continent = Contient.AF
+            dxccdata.continent = Continent.AF
         elif cont == "AS":
-            dxccdata.continent = Contient.AS
+            dxccdata.continent = Continent.AS
         elif cont == "EU":
-            dxccdata.continent = Contient.EU
+            dxccdata.continent = Continent.EU
         elif cont == "NA":
-            dxccdata.continent = Contient.NA
+            dxccdata.continent = Continent.NA
         elif cont == "OC":
-            dxccdata.continent = Contient.OC
+            dxccdata.continent = Continent.OC
         elif cont == "SA":
-            dxccdata.continent = Contient.SA
+            dxccdata.continent = Continent.SA
 
         dxccdata.ituzone = int(data.get("ituzone", 0))
         dxccdata.cqzone = int(data.get("cqzone", 0))

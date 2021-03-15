@@ -13,7 +13,7 @@
 import os
 import sys
 
-import miaowware_sphinx_theme
+import miaowware_sphinx_theme  # type: ignore
 
 sys.path.insert(0, os.path.abspath(".."))
 
@@ -21,7 +21,7 @@ sys.path.insert(0, os.path.abspath(".."))
 # -- Project information -----------------------------------------------------
 
 project = 'qrztools'
-copyright = '2021, classabbyamp, 0x5c'
+copyright = '2021 classabbyamp, 0x5c'
 author = 'classabbyamp, 0x5c'
 
 # The full version, including alpha/beta/rc tags
@@ -34,7 +34,8 @@ release = '{{version}}'
 # extensions coming with Sphinx (named "sphinx.ext.*") or your custom
 # ones.
 extensions = [
-    "sphinx.ext.autodoc"
+    "sphinx.ext.autodoc",
+    "sphinxcontrib.fulltoc"
 ]
 
 # Add any paths that contain templates here, relative to this directory.

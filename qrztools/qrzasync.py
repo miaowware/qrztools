@@ -17,6 +17,19 @@ from .qrztools import QrzAbc, QrzCallsignData, QrzDxccData, QrzError, BASE_URL
 
 
 class QrzAsync(QrzAbc):
+    """The asynchronous QRZ API object
+
+    :param username: QRZ username
+    :type username: str
+    :param password: QRZ password
+    :type password: str
+    :param session_key: QRZ login session key
+    :type session_key: str
+    :param useragent: Useragent for QRZ
+    :type useragent: str
+    :param session: An aiohttp session to use for requests
+    :type session: Optional[aiohttp.ClientSession]
+    """
     def __init__(self, username: str, password: str, session_key: str = "",
                  useragent: str = f"python-qrztools-v{__version__}",
                  session: Optional[aiohttp.ClientSession] = None):
@@ -25,6 +38,13 @@ class QrzAsync(QrzAbc):
 
     @property
     def session(self) -> aiohttp.ClientSession:
+        """
+        :getter: gets the aiohttp session
+        :rtype: aiohttp.ClientSession
+
+        :setter: sets the aiohttp session
+        :type: aiohttp.ClientSession
+        """
         return self._session
 
     @session.setter
@@ -57,7 +77,9 @@ class QrzAsync(QrzAbc):
             return bio
         return ""
 
-    async def get_dxcc(self, query: str) -> QrzDxccData:
+    async def get_dxcc(self, query: Union[str, int]) -> QrzDxccData:
+        if isinstance(query, int):
+            query = str(query)
         if query.lower() == "all":
             raise NotImplementedError("Getting all DXCC data is not supported at this time.")
         try:
