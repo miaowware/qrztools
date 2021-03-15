@@ -115,6 +115,8 @@ class QrzCallsignData:
     aliases: List[str] = field(default_factory=list)
     #: Previous callsign
     prev_call: str = ""
+    #: Trustee information (for clubs)
+    trustee: str = ""
     #: QSL manager info
     qsl_manager: str = ""
     #: license effective date (USA)
@@ -354,6 +356,7 @@ class QrzAbc(ABC):
         calldata.aliases = aliases.upper().split(",") if aliases else aliases
 
         calldata.prev_call = data.get("p_call", "").upper()
+        calldata.trustee = data.get("trustee", "")
         calldata.qsl_manager = data.get("qslmgr", "")
 
         efdate = data.get("efdate", datetime.min)
