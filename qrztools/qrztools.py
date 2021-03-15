@@ -183,12 +183,12 @@ class QrzCallsignData:
     serial: int = 0
     #: QRZ callsign last modified date
     last_modified: datetime = datetime.min
-    #: whether the operator accepts eQSL
-    eqsl: bool = False
-    #: whether the operator accepts mail QSL
-    mail_qsl: bool = False
-    #: whether the operator accepts Logbook of the World QSL
-    lotw_qsl: bool = False
+    #: whether the operator accepts eQSL. ``None`` if unknown
+    eqsl: Optional[bool] = False
+    #: whether the operator accepts mail QSL. ``None`` if unknown
+    mail_qsl: Optional[bool] = False
+    #: whether the operator accepts Logbook of the World QSL. ``None`` if unknown
+    lotw_qsl: Optional[bool] = False
 
 
 @dataclass
@@ -442,13 +442,13 @@ class QrzAbc(ABC):
             calldata.last_modified = datetime.strptime(last_mod, "%Y-%m-%d %H:%M:%S")
 
         eqsl = data.get("eqsl", "")
-        calldata.eqsl = True if eqsl == "1" else False
+        calldata.eqsl = True if eqsl == "1" else False if eqsl == "0" else None
 
         mail_qsl = data.get("mqsl", "")
-        calldata.mail_qsl = True if mail_qsl == "1" else False
+        calldata.mail_qsl = True if mail_qsl == "1" else False if mail_qsl == "0" else None
 
         lotw_qsl = data.get("lotw", "")
-        calldata.lotw_qsl = True if lotw_qsl == "1" else False
+        calldata.lotw_qsl = True if lotw_qsl == "1" else False if lotw_qsl == "0" else None
 
         return calldata
 
