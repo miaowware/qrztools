@@ -2,5 +2,6 @@
 flake8
 mypy
 twine
-sphinx
-sphinx-autobuild
+lxml-stubs
+-r requirements.txt
+-r docs/requirements.txt

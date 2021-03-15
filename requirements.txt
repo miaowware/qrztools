@@ -1,0 +1,5 @@
+lxml
+gridtools
+requests
+aiohttp
+rich

@@ -1,5 +1,5 @@
 import pathlib
-from setuptools import setup
+from setuptools import setup  # type: ignore
 import qrztools.__info__ as info
 
 # The directory containing this file
@@ -18,17 +18,30 @@ setup(
     author=info.__author__,
     author_email=info.__email__,
     license=info.__license__,
-    # NOTE: add classifiers here. See https://pypi.org/pypi?%3Aaction=list_classifiers
     classifiers=[
+        "License :: OSI Approved :: BSD License"
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Development Status :: 5 - Production/Stable",
+        "Environment :: Console",
+        "Intended Audience :: Developers",
+        "Operating System :: OS Independent",
+        "Topic :: Communications :: Ham Radio",
+        "Framework :: AsyncIO",
     ],
     packages=["qrztools"],
     package_data={
-        # NOTE: if the package has typing annotations, add an empty file named
-        # "py.typed" to the package directory.
-        # "qrztools": ["py.typed"]
+        "qrztools": ["py.typed"]
     },
-    # NOTE: add the package's requirements here
-    install_requires=[],
+    install_requires=[
+        "lxml",
+        "gridtools",
+        "rich",
+        "requests; extra != 'async'"
+    ],
+    extras_require={
+        "async": ["aiohttp"],
+        "all": ["aiohttp"]
+    }
 )
