@@ -6,7 +6,7 @@ Released under the terms of the BSD 3-Clause license.
 """
 
 
-from typing import Dict, Union
+from typing import Dict, List, Union
 from io import BytesIO
 
 from lxml import etree
@@ -70,16 +70,16 @@ class QrzSync(QrzAbc):
             return bio
         return ""
 
-    def get_dxcc(self, query: Union[str, int]) -> QrzDxccData:
+    def get_dxcc(self, query: Union[str, int]) -> Union[QrzDxccData, List[QrzDxccData]]:
         if isinstance(query, int):
             query = str(query)
-        if query.lower() == "all":
-            raise NotImplementedError("Getting all DXCC data is not supported at this time.")
+        if query != "all":
+            query = query.upper()
         try:
             self._check_session()
         except QrzError:
             self._login()
-        resp_xml = self._do_query({"s": self._session_key, "dxcc": query.upper()})
+        resp_xml = self._do_query({"s": self._session_key, "dxcc": query})
         if isinstance(resp_xml, etree._Element):
             return self._process_dxcc(resp_xml)
         return QrzDxccData()

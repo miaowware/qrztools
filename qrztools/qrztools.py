@@ -320,7 +320,7 @@ class QrzAbc(ABC):
         pass
 
     @abstractmethod
-    def get_dxcc(self, query: Union[str, int]) -> QrzDxccData:
+    def get_dxcc(self, query: Union[str, int]) -> Union[QrzDxccData, List[QrzDxccData]]:
         """Get data about a DXCC entity from a DXCC entity number or callsign.
 
         :param query: a DXCC entity number or callsign
@@ -471,40 +471,46 @@ class QrzAbc(ABC):
 
         return calldata
 
-    def _process_dxcc(self, resp_xml: etree._Element) -> QrzDxccData:
+    def _process_dxcc(self, resp_xml: etree._Element) -> Union[QrzDxccData, List[QrzDxccData]]:
         # check for errors like "not found"
         self._process_check_session(resp_xml)
-        resp_xml_data = resp_xml.xpath("/x:QRZDatabase/x:DXCC", namespaces={"x": "http://xmldata.qrz.com"})
-        data = {el.tag.split("}")[1]: el.text for el in resp_xml_data[0].getiterator()}  # type: ignore
+        resp_xml_data = list(resp_xml.iterchildren(tag="{http://xmldata.qrz.com}DXCC"))
+        data_list = [{el.tag.split("}")[1]: el.text for el in itm.getiterator()} for itm in resp_xml_data]  # type: ignore
 
-        dxccdata = QrzDxccData()
+        parsed = []
 
-        dxccdata.dxcc = int(data.get("dxcc", 0))
-        dxccdata.cc2 = data.get("cc", "")
-        dxccdata.cc3 = data.get("ccc", "")
-        dxccdata.name = data.get("name", "")
+        for data in data_list:
+            dxccdata = QrzDxccData()
 
-        cont = data.get("continent", None)
-        if cont == "AF":
-            dxccdata.continent = Continent.AF
-        elif cont == "AS":
-            dxccdata.continent = Continent.AS
-        elif cont == "EU":
-            dxccdata.continent = Continent.EU
-        elif cont == "NA":
-            dxccdata.continent = Continent.NA
-        elif cont == "OC":
-            dxccdata.continent = Continent.OC
-        elif cont == "SA":
-            dxccdata.continent = Continent.SA
+            dxccdata.dxcc = int(data.get("dxcc", 0))
+            dxccdata.cc2 = data.get("cc", "")
+            dxccdata.cc3 = data.get("ccc", "")
+            dxccdata.name = data.get("name", "")
 
-        dxccdata.ituzone = int(data.get("ituzone", 0))
-        dxccdata.cqzone = int(data.get("cqzone", 0))
-        dxccdata.utc_offset = data.get("timezone", "")
-        dxccdata.latlong = LatLong(float(data.get("lat", 0)), float(data.get("lon", 0)))
-        dxccdata.notes = data.get("notes", "")
+            cont = data.get("continent", None)
+            if cont == "AF":
+                dxccdata.continent = Continent.AF
+            elif cont == "AS":
+                dxccdata.continent = Continent.AS
+            elif cont == "EU":
+                dxccdata.continent = Continent.EU
+            elif cont == "NA":
+                dxccdata.continent = Continent.NA
+            elif cont == "OC":
+                dxccdata.continent = Continent.OC
+            elif cont == "SA":
+                dxccdata.continent = Continent.SA
 
-        return dxccdata
+            dxccdata.ituzone = int(data.get("ituzone", 0))
+            dxccdata.cqzone = int(data.get("cqzone", 0))
+            dxccdata.utc_offset = data.get("timezone", "")
+            dxccdata.latlong = LatLong(float(data.get("lat", 0)), float(data.get("lon", 0)))
+            dxccdata.notes = data.get("notes", "")
+            parsed.append(dxccdata)
+
+        if len(parsed) == 1:
+            return parsed[0]
+        return parsed
 
     def _process_login(self, resp_xml: etree._Element):
         resp_xml_session = resp_xml.xpath("/x:QRZDatabase/x:Session", namespaces={"x": "http://xmldata.qrz.com"})
