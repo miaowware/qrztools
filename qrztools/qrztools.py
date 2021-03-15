@@ -357,10 +357,16 @@ class QrzAbc(ABC):
         calldata.qsl_manager = data.get("qslmgr", "")
 
         efdate = data.get("efdate", datetime.min)
-        calldata.effective_date = datetime.strptime(efdate, "%Y-%m-%d") if not isinstance(efdate, datetime) else efdate
+        try:
+            calldata.effective_date = datetime.strptime(efdate, "%Y-%m-%d") if not isinstance(efdate, datetime) else efdate
+        except ValueError:
+            calldata.effective_date = datetime.min
 
         expdate = data.get("expdate", datetime.min)
-        calldata.expire_date = datetime.strptime(expdate, "%Y-%m-%d") if not isinstance(expdate, datetime) else expdate
+        try:
+            calldata.expire_date = datetime.strptime(expdate, "%Y-%m-%d") if not isinstance(expdate, datetime) else expdate
+        except ValueError:
+            calldata.expire_date = datetime.min
 
         calldata.lic_class = data.get("class", "")
         calldata.lic_codes = data.get("codes", "")
@@ -393,7 +399,11 @@ class QrzAbc(ABC):
         calldata.itu_zone = int(data.get("ituzone", 0))
 
         born = data.get("born", datetime.min)
-        calldata.born = datetime.strptime(born, "%Y-%m-%d") if not isinstance(born, datetime) else born
+        try:
+            calldata.born = datetime.strptime(born, "%Y-%m-%d") if not isinstance(born, datetime) else born
+        except ValueError:
+            calldata.born = datetime.min
+
         calldata.iota = data.get("iota", "")
 
         geoloc = data.get("geoloc", None).lower()
@@ -424,7 +434,10 @@ class QrzAbc(ABC):
 
         biodate = data.get("biodate", datetime.min)
         if not isinstance(biodate, datetime):
-            calldata.bio_updated = datetime.strptime(biodate, "%Y-%m-%d %H:%M:%S")
+            try:
+                calldata.bio_updated = datetime.strptime(biodate, "%Y-%m-%d %H:%M:%S")
+            except ValueError:
+                calldata.bio_updated = datetime.min
 
         img_info = data.get("imageinfo", "0:0:0")
         img_height, img_width, img_size = [int(x) for x in img_info.split(":")]
@@ -439,7 +452,10 @@ class QrzAbc(ABC):
 
         last_mod = data.get("moddate", datetime.min)
         if not isinstance(last_mod, datetime):
-            calldata.last_modified = datetime.strptime(last_mod, "%Y-%m-%d %H:%M:%S")
+            try:
+                calldata.last_modified = datetime.strptime(last_mod, "%Y-%m-%d %H:%M:%S")
+            except ValueError:
+                calldata.last_modified = datetime.min
 
         eqsl = data.get("eqsl", "")
         calldata.eqsl = True if eqsl == "1" else False if eqsl == "0" else None
