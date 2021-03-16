@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
-## [1.0.1] - 2021-03-15
+## [1.1.0] - 2021-03-15
 ### Added
 - Support for getting trustee info from `get_callsign()` queries
 - Support for `all` as an argument for `get_dxcc()`
@@ -25,6 +25,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Synchronous and asynchronous interfaces to QRZ
 
 
-[Unreleased]: https://github.com/miaowware/qrztools/compare/1.0.1...HEAD
-[1.0.1]: https://github.com/miaowware/qrztools/releases/tag/1.0.1
+[Unreleased]: https://github.com/miaowware/qrztools/compare/1.1.0...HEAD
+[1.1.0]: https://github.com/miaowware/qrztools/releases/tag/1.1.0
 [1.0.0]: https://github.com/miaowware/qrztools/releases/tag/1.0.0
