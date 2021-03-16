@@ -37,10 +37,10 @@ setup(
     install_requires=[
         "lxml",
         "gridtools",
-        "rich",
         "requests; extra != 'async'"
     ],
     extras_require={
+        "cli": ["rich"],
         "async": ["aiohttp"],
         "all": ["aiohttp"]
     }

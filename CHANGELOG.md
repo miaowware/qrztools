@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Support for `all` as an argument for `get_dxcc()`
 ### Changed
 - `QrzCallsignData.eqsl`, `QrzCallsignData.mail_qsl`, and `QrzCallsignData.lotw_qsl` now is `None` if the value is unknown
+- The dependency `rich` to be be installed via the extra `cli`, instead of being installed by default
 ### Fixed
 - An error when getting some callsigns because of invalid dates.
 - An issue where the documentation would not render properly.
