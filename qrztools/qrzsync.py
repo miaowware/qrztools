@@ -51,6 +51,8 @@ class QrzSync(QrzAbc):
         self._session = val
 
     def get_callsign(self, callsign: str) -> QrzCallsignData:
+        if not callsign.isalnum():
+            raise QrzError("Invalid Callsign")
         try:
             self._check_session()
         except QrzError:
@@ -61,6 +63,8 @@ class QrzSync(QrzAbc):
         return QrzCallsignData("Unknown")
 
     def get_bio(self, callsign: str) -> str:
+        if not callsign.isalnum():
+            raise QrzError("Invalid Callsign")
         try:
             self._check_session()
         except QrzError:
@@ -72,8 +76,12 @@ class QrzSync(QrzAbc):
 
     def get_dxcc(self, query: Union[str, int]) -> Union[QrzDxccData, List[QrzDxccData]]:
         if isinstance(query, int):
+            if query < 0:
+                raise QrzError("Invalid DXCC Entity Number")
             query = str(query)
         if query != "all":
+            if not query.isalnum():
+                raise QrzError("Invalid Query")
             query = query.upper()
         try:
             self._check_session()
