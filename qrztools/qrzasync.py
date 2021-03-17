@@ -58,6 +58,8 @@ class QrzAsync(QrzAbc):
         await self._session.close()
 
     async def get_callsign(self, callsign: str) -> QrzCallsignData:
+        if not callsign.isalnum():
+            raise QrzError("Invalid Callsign")
         try:
             await self._check_session()
         except QrzError:
@@ -68,6 +70,8 @@ class QrzAsync(QrzAbc):
         return QrzCallsignData("Unknown")
 
     async def get_bio(self, callsign: str) -> str:
+        if not callsign.isalnum():
+            raise QrzError("Invalid Callsign")
         try:
             await self._check_session()
         except QrzError:
@@ -79,8 +83,12 @@ class QrzAsync(QrzAbc):
 
     async def get_dxcc(self, query: Union[str, int]) -> Union[QrzDxccData, List[QrzDxccData]]:
         if isinstance(query, int):
+            if query < 0:
+                raise QrzError("Invalid DXCC Entity Number")
             query = str(query)
         if query != "all":
+            if not query.isalnum():
+                raise QrzError("Invalid Query")
             query = query.upper()
         try:
             await self._check_session()
