@@ -2,4 +2,4 @@ sphinx
 sphinx-autobuild
 sphinxcontrib-fulltoc
 -e git+https://github.com/miaowware/miaowware-sphinx-theme.git#egg=miaowware_sphinx_theme
-# put package dependencies here
+-r ../requirements.txt

@@ -25,7 +25,7 @@ copyright = '2021 classabbyamp, 0x5c'
 author = 'classabbyamp, 0x5c'
 
 # The full version, including alpha/beta/rc tags
-release = '1.0.0'
+release = '1.1.0'
 
 
 # -- General configuration ---------------------------------------------------

@@ -115,6 +115,8 @@ class QrzCallsignData:
     aliases: List[str] = field(default_factory=list)
     #: Previous callsign
     prev_call: str = ""
+    #: Trustee information (for clubs)
+    trustee: str = ""
     #: QSL manager info
     qsl_manager: str = ""
     #: license effective date (USA)
@@ -183,12 +185,12 @@ class QrzCallsignData:
     serial: int = 0
     #: QRZ callsign last modified date
     last_modified: datetime = datetime.min
-    #: whether the operator accepts eQSL
-    eqsl: bool = False
-    #: whether the operator accepts mail QSL
-    mail_qsl: bool = False
-    #: whether the operator accepts Logbook of the World QSL
-    lotw_qsl: bool = False
+    #: whether the operator accepts eQSL. ``None`` if unknown
+    eqsl: Optional[bool] = False
+    #: whether the operator accepts mail QSL. ``None`` if unknown
+    mail_qsl: Optional[bool] = False
+    #: whether the operator accepts Logbook of the World QSL. ``None`` if unknown
+    lotw_qsl: Optional[bool] = False
 
 
 @dataclass
@@ -318,7 +320,7 @@ class QrzAbc(ABC):
         pass
 
     @abstractmethod
-    def get_dxcc(self, query: Union[str, int]) -> QrzDxccData:
+    def get_dxcc(self, query: Union[str, int]) -> Union[QrzDxccData, List[QrzDxccData]]:
         """Get data about a DXCC entity from a DXCC entity number or callsign.
 
         :param query: a DXCC entity number or callsign
@@ -354,13 +356,20 @@ class QrzAbc(ABC):
         calldata.aliases = aliases.upper().split(",") if aliases else aliases
 
         calldata.prev_call = data.get("p_call", "").upper()
+        calldata.trustee = data.get("trustee", "")
         calldata.qsl_manager = data.get("qslmgr", "")
 
         efdate = data.get("efdate", datetime.min)
-        calldata.effective_date = datetime.strptime(efdate, "%Y-%m-%d") if not isinstance(efdate, datetime) else efdate
+        try:
+            calldata.effective_date = datetime.strptime(efdate, "%Y-%m-%d") if not isinstance(efdate, datetime) else efdate
+        except ValueError:
+            calldata.effective_date = datetime.min
 
         expdate = data.get("expdate", datetime.min)
-        calldata.expire_date = datetime.strptime(expdate, "%Y-%m-%d") if not isinstance(expdate, datetime) else expdate
+        try:
+            calldata.expire_date = datetime.strptime(expdate, "%Y-%m-%d") if not isinstance(expdate, datetime) else expdate
+        except ValueError:
+            calldata.expire_date = datetime.min
 
         calldata.lic_class = data.get("class", "")
         calldata.lic_codes = data.get("codes", "")
@@ -393,7 +402,11 @@ class QrzAbc(ABC):
         calldata.itu_zone = int(data.get("ituzone", 0))
 
         born = data.get("born", datetime.min)
-        calldata.born = datetime.strptime(born, "%Y-%m-%d") if not isinstance(born, datetime) else born
+        try:
+            calldata.born = datetime.strptime(born, "%Y-%m-%d") if not isinstance(born, datetime) else born
+        except ValueError:
+            calldata.born = datetime.min
+
         calldata.iota = data.get("iota", "")
 
         geoloc = data.get("geoloc", None).lower()
@@ -424,7 +437,10 @@ class QrzAbc(ABC):
 
         biodate = data.get("biodate", datetime.min)
         if not isinstance(biodate, datetime):
-            calldata.bio_updated = datetime.strptime(biodate, "%Y-%m-%d %H:%M:%S")
+            try:
+                calldata.bio_updated = datetime.strptime(biodate, "%Y-%m-%d %H:%M:%S")
+            except ValueError:
+                calldata.bio_updated = datetime.min
 
         img_info = data.get("imageinfo", "0:0:0")
         img_height, img_width, img_size = [int(x) for x in img_info.split(":")]
@@ -439,53 +455,62 @@ class QrzAbc(ABC):
 
         last_mod = data.get("moddate", datetime.min)
         if not isinstance(last_mod, datetime):
-            calldata.last_modified = datetime.strptime(last_mod, "%Y-%m-%d %H:%M:%S")
+            try:
+                calldata.last_modified = datetime.strptime(last_mod, "%Y-%m-%d %H:%M:%S")
+            except ValueError:
+                calldata.last_modified = datetime.min
 
         eqsl = data.get("eqsl", "")
-        calldata.eqsl = True if eqsl == "1" else False
+        calldata.eqsl = True if eqsl == "1" else False if eqsl == "0" else None
 
         mail_qsl = data.get("mqsl", "")
-        calldata.mail_qsl = True if mail_qsl == "1" else False
+        calldata.mail_qsl = True if mail_qsl == "1" else False if mail_qsl == "0" else None
 
         lotw_qsl = data.get("lotw", "")
-        calldata.lotw_qsl = True if lotw_qsl == "1" else False
+        calldata.lotw_qsl = True if lotw_qsl == "1" else False if lotw_qsl == "0" else None
 
         return calldata
 
-    def _process_dxcc(self, resp_xml: etree._Element) -> QrzDxccData:
+    def _process_dxcc(self, resp_xml: etree._Element) -> Union[QrzDxccData, List[QrzDxccData]]:
         # check for errors like "not found"
         self._process_check_session(resp_xml)
-        resp_xml_data = resp_xml.xpath("/x:QRZDatabase/x:DXCC", namespaces={"x": "http://xmldata.qrz.com"})
-        data = {el.tag.split("}")[1]: el.text for el in resp_xml_data[0].getiterator()}  # type: ignore
+        resp_xml_data = list(resp_xml.iterchildren(tag="{http://xmldata.qrz.com}DXCC"))
+        data_list = [{el.tag.split("}")[1]: el.text for el in itm.getiterator()} for itm in resp_xml_data]  # type: ignore
 
-        dxccdata = QrzDxccData()
+        parsed = []
 
-        dxccdata.dxcc = int(data.get("dxcc", 0))
-        dxccdata.cc2 = data.get("cc", "")
-        dxccdata.cc3 = data.get("ccc", "")
-        dxccdata.name = data.get("name", "")
+        for data in data_list:
+            dxccdata = QrzDxccData()
 
-        cont = data.get("continent", None)
-        if cont == "AF":
-            dxccdata.continent = Continent.AF
-        elif cont == "AS":
-            dxccdata.continent = Continent.AS
-        elif cont == "EU":
-            dxccdata.continent = Continent.EU
-        elif cont == "NA":
-            dxccdata.continent = Continent.NA
-        elif cont == "OC":
-            dxccdata.continent = Continent.OC
-        elif cont == "SA":
-            dxccdata.continent = Continent.SA
+            dxccdata.dxcc = int(data.get("dxcc", 0))
+            dxccdata.cc2 = data.get("cc", "")
+            dxccdata.cc3 = data.get("ccc", "")
+            dxccdata.name = data.get("name", "")
 
-        dxccdata.ituzone = int(data.get("ituzone", 0))
-        dxccdata.cqzone = int(data.get("cqzone", 0))
-        dxccdata.utc_offset = data.get("timezone", "")
-        dxccdata.latlong = LatLong(float(data.get("lat", 0)), float(data.get("lon", 0)))
-        dxccdata.notes = data.get("notes", "")
+            cont = data.get("continent", None)
+            if cont == "AF":
+                dxccdata.continent = Continent.AF
+            elif cont == "AS":
+                dxccdata.continent = Continent.AS
+            elif cont == "EU":
+                dxccdata.continent = Continent.EU
+            elif cont == "NA":
+                dxccdata.continent = Continent.NA
+            elif cont == "OC":
+                dxccdata.continent = Continent.OC
+            elif cont == "SA":
+                dxccdata.continent = Continent.SA
 
-        return dxccdata
+            dxccdata.ituzone = int(data.get("ituzone", 0))
+            dxccdata.cqzone = int(data.get("cqzone", 0))
+            dxccdata.utc_offset = data.get("timezone", "")
+            dxccdata.latlong = LatLong(float(data.get("lat", 0)), float(data.get("lon", 0)))
+            dxccdata.notes = data.get("notes", "")
+            parsed.append(dxccdata)
+
+        if len(parsed) == 1:
+            return parsed[0]
+        return parsed
 
     def _process_login(self, resp_xml: etree._Element):
         resp_xml_session = resp_xml.xpath("/x:QRZDatabase/x:Session", namespaces={"x": "http://xmldata.qrz.com"})

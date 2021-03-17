@@ -17,7 +17,12 @@ $ pip install qrztools[async]
 
 # both sync and async
 $ pip install qrztools[all]
+
+# enable the CLI
+$ pip install qrztools[cli]
 ```
+
+**Note:** If `requests`, `aiohttp`, or `rich` are installed another way, you will also have access to the sync, async, or command-line interface, respectively.
 
 ## Documentation
 
