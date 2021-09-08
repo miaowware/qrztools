@@ -1,5 +1,7 @@
 # qrztools
 
+# **WARNING:** This library is now deprecated. Use [callsignlookuptools](https://pypi.org/project/callsignlookuptools/) instead.
+
 QRZ API interface in Python
 
 [![PyPI](https://img.shields.io/pypi/v/qrztools)](https://pypi.org/project/qrztools/) ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/qrztools) ![PyPI - License](https://img.shields.io/pypi/l/qrztools) [![Documentation Status](https://readthedocs.org/projects/qrztools/badge/?version=latest)](https://qrztools.readthedocs.io/en/latest/?badge=latest)

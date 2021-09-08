@@ -23,7 +23,7 @@ setup(
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
-        "Development Status :: 5 - Production/Stable",
+        "Development Status :: 7 - Inactive",
         "Environment :: Console",
         "Intended Audience :: Developers",
         "Operating System :: OS Independent",
