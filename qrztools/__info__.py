@@ -6,7 +6,7 @@ __project__ = "qrztools"
 __summary__ = "DEPRECATED - QRZ API interface in Python"
 __webpage__ = "https://qrztools.miaow.io"
 
-__version__ = "1.1.1"
+__version__ = "1.2.0"
 
 __author__ = "classabbyamp, 0x5c"
 __email__ = "dev@kb6.ee, dev@0x5c.io"
