@@ -2,6 +2,8 @@
 Types
 =====
 
+.. WARNING:: This library is now deprecated. Use `callsignlookuptools <https://pypi.org/project/callsignlookuptools/>`_ instead.
+
 .. highlight:: none
 
 .. module:: qrztools.qrztools

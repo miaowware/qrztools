@@ -3,7 +3,7 @@
 
 
 __project__ = "qrztools"
-__summary__ = "QRZ API interface in Python"
+__summary__ = "DEPRECATED - QRZ API interface in Python"
 __webpage__ = "https://qrztools.miaow.io"
 
 __version__ = "1.1.1"

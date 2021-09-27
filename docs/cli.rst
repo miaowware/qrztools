@@ -2,6 +2,8 @@
 CLI Usage
 =========
 
+.. WARNING:: This library is now deprecated. Use `callsignlookuptools <https://pypi.org/project/callsignlookuptools/>`_ instead.
+
 .. highlight:: none
 
 .. NOTE:: To use the CLI, install with the extra ``cli`` (e.g. ``pip install qrztools[cli]``) or otherwise install the library ``rich``.

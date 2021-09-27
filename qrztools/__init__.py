@@ -8,10 +8,13 @@ Released under the terms of the BSD 3-Clause license.
 """
 
 from importlib.util import find_spec
+from warnings import warn
 
 from .__info__ import __version__  # noqa: F401
 
 from .qrztools import QrzError, QrzCallsignData, QrzDxccData, QrzAbc  # noqa: F401
+
+warn("This library is now deprecated. Use callsignlookuptools instead.", DeprecationWarning, stacklevel=2)
 
 if find_spec("requests"):
     from .qrzsync import QrzSync  # noqa: F401

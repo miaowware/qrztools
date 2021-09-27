@@ -2,6 +2,8 @@
 API Reference
 =============
 
+.. WARNING:: This library is now deprecated. Use `callsignlookuptools <https://pypi.org/project/callsignlookuptools/>`_ instead.
+
 .. highlight:: none
 
 ``qrztools`` allows for both synchronous and asynchronous usage via two main classes, :class:`qrztools.QrzSync` and :class:`qrztools.QrzAsync`.
